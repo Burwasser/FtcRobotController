@@ -65,7 +65,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="encoder", group="Robot")
 //@Disabled
-public class EncoderAutonomous extends LinearOpMode {
+public class ParkingCloseRed extends LinearOpMode {
 
 
     /* Declare OpMode members. */
