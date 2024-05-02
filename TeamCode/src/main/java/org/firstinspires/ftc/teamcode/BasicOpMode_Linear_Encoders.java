@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,13 +63,13 @@ public class BasicOpMode_Linear_Encoders extends LinearOpMode {
     private DcMotor backLeftDrive;
     private DcMotor backRightDrive;
     private DcMotor motorIntake;
-    private DcMotor slideLeft;
-    private DcMotor pullUp;
-    private Servo   grabberIntake;
+    private DcMotor slideMotor;
+    private DcMotor pullupMotor;
+    private Servo   grabberServo;
     private Servo grabberRotate;
     private TouchSensor limitSwitch;
     private Servo droneLaunch;
-
+    private Servo liftHook;
 
     @Override
     public void runOpMode() {
@@ -83,13 +84,13 @@ public class BasicOpMode_Linear_Encoders extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class,   "back_left_motor");
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
         motorIntake = hardwareMap.get(DcMotor.class, "motor_intake");
-        slideLeft = hardwareMap.get(DcMotor.class, "slide_left");
-        pullUp  = hardwareMap.get(DcMotor.class, "pull_up");
-        grabberIntake = hardwareMap.get(Servo.class, "open_grabber");
+        slideMotor = hardwareMap.get(DcMotor.class, "slide_motor");
+        pullupMotor  = hardwareMap.get(DcMotor.class, "pull_up");
+        grabberServo = hardwareMap.get(Servo.class, "open_grabber");
         grabberRotate = hardwareMap.get(Servo.class, "rotate_grabber");
         limitSwitch = hardwareMap.get(TouchSensor.class, "limit_switch");
         droneLaunch = hardwareMap.get(Servo.class, "drone_launcher");
-
+        liftHook = hardwareMap.get(Servo.class, "lift_hook");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -97,10 +98,12 @@ public class BasicOpMode_Linear_Encoders extends LinearOpMode {
         // frontLeft & backRight should be in reverse
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        slideLeft.setDirection(DcMotor.Direction.REVERSE);
+        slideMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        slideLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slideLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pullupMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pullupMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -130,14 +133,16 @@ public class BasicOpMode_Linear_Encoders extends LinearOpMode {
             boolean droneLauncher = gamepad1.left_bumper;
             boolean liftUp = gamepad1.y;
             boolean liftDown = gamepad1.x;
-
+            boolean liftHookUp = gamepad1.dpad_up;
+            boolean liftHookDown = gamepad1.dpad_down;
 
             //controller 2 - INTAKE
             boolean slideUp = gamepad2.y;
             boolean slideDown = gamepad2.x;
-            boolean twoPixelGrabber = gamepad2.right_bumper;
+            //
+            // boolean twoPixelGrabber = gamepad2.right_bumper;
             boolean closeGrabber = gamepad2.a;
-            boolean onePixelGrabber = gamepad2.left_bumper;
+            double PixelGrabber = gamepad2.left_trigger;
             boolean rotateFront = gamepad2.dpad_up;
             boolean rotateBack = gamepad2.dpad_down;
             boolean rotateLeft = gamepad2.dpad_left;
@@ -156,14 +161,14 @@ public class BasicOpMode_Linear_Encoders extends LinearOpMode {
             //for the robot slide to go up and down, limit switch is implemented 
             //GOAL: Read out position of the lift to the telemetry.
 
-            int liftPosition = slideLeft.getCurrentPosition();
+            int liftPosition = slideMotor.getCurrentPosition();
 
-            if(slideUp){
-                slideLeft.setPower(1);
+            if(slideUp && liftPosition < 10743){
+                slideMotor.setPower(1);
             } else if (slideDown && !limitSwitch.isPressed()){
-                slideLeft.setPower(-1);
+                slideMotor.setPower(-1);
             } else {
-                slideLeft.setPower(0);
+                slideMotor.setPower(0);
             }
 /*
 Possible start to a 'run to position' lift code. If you want to add more than
@@ -185,15 +190,12 @@ two positions to your run-to-position code, look into 'switch' statements.
 
 
             //servos can only rotate 180 degrees, can get close to 0 but never negative
-            //calibrated for two pixel grabber and close and open grabber
-            if (twoPixelGrabber){
-                grabberIntake.setPosition(0.18);
-            }
-            if(closeGrabber){
-                grabberIntake.setPosition(0.01);
-            }
-            if(onePixelGrabber){
-                grabberIntake.setPosition(0.20);
+            //holding PixelGrabber button opens grabber, otherwise it is closed
+
+            if(PixelGrabber > 0.5){
+                grabberServo.setPosition(0.6);
+            } else {
+                grabberServo.setPosition(0.01);
             }
 
             /* Used for rotating Grabber 
@@ -201,11 +203,12 @@ two positions to your run-to-position code, look into 'switch' statements.
                 - Back: to drop pixels [DO NOT CHANGE, the number is so that second servo hits metal]
                 - Left: to make sure pixels do not hit the bolts
             */
-            //.42
+            //Rotates the grabber out of the way as the slide goes up and down/pushes pixel into
+            //the backboard
             if(rotateFront){
                 grabberRotate.setPosition(.42);
             }
-            if(rotateBack){
+            if(rotateBack && liftPosition > 5015){
                 grabberRotate.setPosition(.17);
             }
             if(rotateLeft){
@@ -219,14 +222,23 @@ two positions to your run-to-position code, look into 'switch' statements.
             }
 
             //Lift Robo Up, go robo go robo
-            if(liftUp){
-                pullUp.setPower(1);
+            int pullupPosition = pullupMotor.getCurrentPosition();
+
+            if(liftUp && pullupPosition < 9000000 ){
+                pullupMotor.setPower(1);
             } else if (liftDown){
-                pullUp.setPower(-1);
+                pullupMotor.setPower(-1);
             } else {
-                pullUp.setPower(0);
+                pullupMotor.setPower(0);
             }
 
+            //Make the hook go up and down
+            if(liftHookUp) {
+                liftHook.setPosition(.3);
+            }
+            if(liftHookDown){
+                liftHook.setPosition(0);
+            }
 
 
             frontleftPower   = Range.clip(drive + turn + strafe, -1.0, 1.0) ;
@@ -247,7 +259,7 @@ two positions to your run-to-position code, look into 'switch' statements.
             //telemetry.addData("Motors", "front left (%.2f), front right (%.2f), back left (%.2f), back right (%.2f)",
                     //frontleftPower, frontrightPower, backleftPower, backrightPower);
 
-            telemetry.addData("Slide Position", liftPosition);
+            telemetry.addData("pull up Position", pullupPosition);
             telemetry.update();
         }
         

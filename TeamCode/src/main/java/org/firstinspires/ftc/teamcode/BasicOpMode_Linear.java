@@ -85,7 +85,7 @@ public class BasicOpMode_Linear extends LinearOpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class,   "back_left_motor");
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
         motorIntake = hardwareMap.get(DcMotor.class, "motor_intake");
-        slideLeft = hardwareMap.get(DcMotor.class, "slide_left");
+        slideLeft = hardwareMap.get(DcMotor.class, "slide_motor");
         pullUp  = hardwareMap.get(DcMotor.class, "pull_up");
         grabberIntake = hardwareMap.get(Servo.class, "open_grabber");
         grabberRotate = hardwareMap.get(Servo.class, "rotate_grabber");
