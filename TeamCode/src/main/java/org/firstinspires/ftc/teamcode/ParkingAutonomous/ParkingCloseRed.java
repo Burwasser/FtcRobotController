@@ -27,16 +27,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.ParkingAutonomous;
+package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.Subsystem.TeamElementDetection.TeamElementSubsystem;
 
 
 
@@ -66,9 +63,9 @@ import org.firstinspires.ftc.teamcode.Subsystem.TeamElementDetection.TeamElement
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="P - close red", group="Robot")
+@Autonomous(name="encoder", group="Robot")
 //@Disabled
-public class ParkingCloseRed extends LinearOpMode {
+public class EncoderAutonomous extends LinearOpMode {
 
 
     /* Declare OpMode members. */
@@ -76,14 +73,9 @@ public class ParkingCloseRed extends LinearOpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
-    private DcMotor motorIntake = null;
-    private Servo grabberIntake = null;
-    private Servo grabberRotate = null;
-    private DcMotor slideLeft;
-
 
     private ElapsedTime runtime = new ElapsedTime();
-    private TeamElementSubsystem teamElementDetection=null;
+
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
     // For external drive gearing, set DRIVE_GEAR_REDUCTION as needed.
@@ -95,26 +87,16 @@ public class ParkingCloseRed extends LinearOpMode {
     static final double WHEEL_DIAMETER_INCHES = 11;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION ) /
             (WHEEL_DIAMETER_INCHES * 3.14159);
-    static final double DRIVE_SPEED = 1.0;
+    static final double DRIVE_SPEED = 0.6;
 
     @Override
     public void runOpMode() {
-
 
         // Initialize the drive system variables.
         frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left_motor");
         frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_motor");
         backLeftDrive = hardwareMap.get(DcMotor.class, "back_left_motor");
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
-        motorIntake = hardwareMap.get(DcMotor.class, "motor_intake");
-        grabberIntake = hardwareMap.get(Servo.class, "open_grabber");
-        grabberRotate = hardwareMap.get(Servo.class, "rotate_grabber");
-        slideLeft = hardwareMap.get(DcMotor.class, "slide_left");
-
-        /* change in future to match other hardware, assuming this is for the camera*/
-        teamElementDetection = new TeamElementSubsystem(hardwareMap);
-
-
 
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -148,13 +130,19 @@ public class ParkingCloseRed extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        // Step through each leg of the path,
+        // Note: Reverse movement is obtained by setting a negative distance (not speed)
+
+//        //Rotate: Positive, Right
+//        encoderRotate(10, 4);
+
+        //Driving: Positive, Forward
+        encoderStrafe(40, 4);
+//        //Strafing: Positive, Right
+//        encoderStrafe(30, 4);
 
 
-        sleep(1000);
-        encoderDrive(10,8);
-        encoderStrafe(30,8);
-
-
+        // S2: Turn Right 12 Inches with 4 Sec timeout
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -170,35 +158,8 @@ public class ParkingCloseRed extends LinearOpMode {
      *  3) Driver stops the OpMode running.
      */
 
-    public void gripPixel(){
-        grabberIntake.setPosition(.01);
-    }
-
-    public void pushPixel(int sleep){
-        motorIntake.setPower(-.3);
-        sleep(sleep);
-        motorIntake.setPower(0);
-    }
-
-    public void dropPixel(){
-        slideLeft.setPower(-1);
-        sleep(100);
-        grabberRotate.setPosition(.6);
-        slideLeft.setPower(-1);
-        sleep(400);
-        grabberRotate.setPosition(.17);
-        grabberIntake.setPosition(.18);
-        grabberIntake.setPosition(.01);
-        grabberRotate.setPosition(.6);
-        slideLeft.setPower(1);
-        sleep(400);
-    }
-
     //Modify encoderDriveForward to use all four wheels
     public void encoderDrive(double Inches, double timeoutS) {
-        //This function takes a distance in inches and timeout in seconds, both as doubles.
-        // If the distance is negative, the robot will move backward. If positive, it moves forward.
-
         //should we have separate forward drive and backward drive methods???
 
         int newFrontLeftTarget;
@@ -272,9 +233,6 @@ public class ParkingCloseRed extends LinearOpMode {
     //Below, add an encoderDriveTurn and encoderDriveStrafe method
 
     public void encoderStrafe(double Inches, double timeoutS) {
-        // This function takes a distance in inches and timeout in seconds, both as doubles.
-        // If the distance is negative, the robot will strafe left. If positive, it strafes right.
-
         //put something informative here
         int newFrontLeftTarget;
         int newFrontRightTarget;
@@ -344,9 +302,6 @@ public class ParkingCloseRed extends LinearOpMode {
     }
 
     public void encoderRotate(double Inches, double timeoutS) {
-        // This function takes a distance in inches and timeout in seconds, both as doubles.
-        // If the distance is negative, the robot will rotate to the left. If positive, it rotates to the right.
-
         int newFrontLeftTarget;
         int newFrontRightTarget;
         int newBackLeftTarget;
