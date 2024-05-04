@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -76,6 +77,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.TeamElementDetection.TeamElement
 
 @Autonomous(name="Close Backboard Blue Copy", group="Robot")
 //Autonomous for close to backboard blue
+@Disabled
 public class EA_CloseBlueBackboard_copy extends LinearOpMode {
 
     /* Declare DcMotors - Wheels */
