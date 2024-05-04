@@ -193,7 +193,7 @@ two positions to your run-to-position code, look into 'switch' statements.
             //holding PixelGrabber button opens grabber, otherwise it is closed
 
             if(PixelGrabber > 0.5){
-                grabberServo.setPosition(0.6);
+                grabberServo.setPosition(0.3);
             } else {
                 grabberServo.setPosition(0.01);
             }
@@ -259,7 +259,8 @@ two positions to your run-to-position code, look into 'switch' statements.
             //telemetry.addData("Motors", "front left (%.2f), front right (%.2f), back left (%.2f), back right (%.2f)",
                     //frontleftPower, frontrightPower, backleftPower, backrightPower);
 
-            telemetry.addData("pull up Position", pullupPosition);
+            //telemetry.addData("pull up Position ", pullupPosition);
+            telemetry.addData("lift Position ", liftPosition);
             telemetry.update();
         }
         

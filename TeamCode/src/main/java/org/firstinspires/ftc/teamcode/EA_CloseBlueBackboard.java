@@ -128,7 +128,7 @@ public class EA_CloseBlueBackboard extends LinearOpMode {
         rotateGrabber = hardwareMap.get(Servo.class, "rotate_grabber");
         intakeGrabber = hardwareMap.get(Servo.class, "open_grabber");
         motorIntake = hardwareMap.get(DcMotor.class, "motor_intake");
-        slideUp = hardwareMap.get(DcMotor.class, "slide_left");
+        slideUp = hardwareMap.get(DcMotor.class, "slide_motor");
 
 
         /* change in future to match other hardware, assuming this is for the camera*/

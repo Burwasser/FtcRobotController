@@ -112,7 +112,7 @@ public class UniversalAutonomous extends LinearOpMode {
         motorIntake = hardwareMap.get(DcMotor.class, "motor_intake");
         grabberIntake = hardwareMap.get(Servo.class, "open_grabber");
         grabberRotate = hardwareMap.get(Servo.class, "rotate_grabber");
-        slideLeft = hardwareMap.get(DcMotor.class, "slide_left");
+        slideLeft = hardwareMap.get(DcMotor.class, "slide_motor");
 
         /* change in future to match other hardware, assuming this is for the camera*/
         teamElementDetection = new TeamElementSubsystem(hardwareMap);
